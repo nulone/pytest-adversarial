@@ -1,0 +1,48 @@
+# .dockerignore
+# Не копируем в Docker образ
+
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+.eggs
+*.egg
+.mypy_cache
+.pytest_cache
+
+# Виртуальные окружения
+venv
+.venv
+ENV
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Результаты (монтируются отдельно)
+results/
+*.json
+*.log
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Документация
+*.md
+!README.md
+
+# Временные файлы
+.DS_Store
+Thumbs.db
+*~

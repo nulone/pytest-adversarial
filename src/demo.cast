@@ -1,0 +1,4 @@
+{"version":3,"term":{"cols":214,"rows":59,"type":"xterm-256color","theme":{"fg":"#28fe14","bg":"#000000","palette":"#000000:#990000:#00a600:#999900:#0000b3:#b300b3:#00a6b3:#bfbfbf:#666666:#e60000:#00d900:#e6e600:#0000ff:#e600e6:#00e6e6:#e6e6e6"}},"timestamp":1768364560,"command":"(sleep 8; echo '1') | python3 src/drq.py","env":{"SHELL":"/bin/zsh"}}
+[0.138, "o", "python3: can't open file '/Users/rogerz/_Coding/_2026/code-hardening/src/src/drq.py': [Errno 2] No such file or directory\r\n"]
+[3.406, "o", "^C"]
+[0.001, "x", "130"]

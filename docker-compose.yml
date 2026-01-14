@@ -1,0 +1,82 @@
+# docker-compose.yml
+# Безопасный запуск ACH в изолированном контейнере
+#
+# Использование:
+#   ./start.sh                    # Рекомендуемый способ
+#   docker-compose run --rm ach   # Напрямую
+#
+# Настройка API ключа:
+#   export NANOGPT_API_KEY='ваш-ключ-с-nano-gpt.com'
+#   ./start.sh
+
+services:
+  ach:
+    build: .
+    
+    # Переменные окружения
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - NANOGPT_API_KEY=${NANOGPT_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    
+    # БЕЗОПАСНОСТЬ: Ограничения ресурсов
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+          pids: 100
+    
+    # БЕЗОПАСНОСТЬ: Read-only файловая система
+    read_only: true
+    tmpfs:
+      - /tmp:size=100m,mode=1777
+    
+    # БЕЗОПАСНОСТЬ: Нет привилегий
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    
+    working_dir: /app
+    
+    # Интерактивный режим для выбора пресета
+    stdin_open: true
+    tty: true
+    
+    command: python examples/json_parser/manual_loop.py
+    
+    # Монтируем результаты
+    volumes:
+      - ./results:/app/results:rw
+      - ./examples/json_parser:/app/examples/json_parser:rw
+
+  # Shell для отладки
+  shell:
+    build: .
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - NANOGPT_API_KEY=${NANOGPT_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+          pids: 100
+    read_only: true
+    tmpfs:
+      - /tmp:size=100m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    working_dir: /app
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./results:/app/results:rw
+      - ./examples/json_parser:/app/examples/json_parser:rw
