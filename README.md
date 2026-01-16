@@ -1,8 +1,8 @@
 # pytest-adversarial
 
-![Demo](demo.gif)
-
 Generate adversarial pytest tests using LLM.
+
+![Demo](demo.gif)
 
 Attempts to find edge cases in your Python code by generating attack tests. Can also suggest fixes.
 
