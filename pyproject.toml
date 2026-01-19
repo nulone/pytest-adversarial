@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "A pytest plugin for adversarial testing with AI-powered inputs"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "pytest-adversarial contributors"}
 ]
@@ -28,11 +28,8 @@ dev = [
     "ruff>=0.0.270",
 ]
 
-[project.entry-points.pytest11]
-pytest_adversarial = "pytest_adversarial.plugin"
-
 [tool.setuptools]
-packages = ["pytest_adversarial"]
+py-modules = []
 
 [tool.ruff]
 line-length = 100
