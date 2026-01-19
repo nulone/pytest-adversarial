@@ -45,6 +45,7 @@ def get_client(config: ModelConfig) -> OpenAI:
 @dataclass
 class Attack:
     """Результат работы Attacker'а."""
+
     test_code: str
     description: str
     attack_type: str
@@ -53,6 +54,7 @@ class Attack:
 @dataclass
 class Defense:
     """Результат работы Defender'а."""
+
     fixed_code: str
     explanation: str
 
@@ -153,14 +155,19 @@ Output the combined test in ```python``` block."""
 
         prompt = self.MUTATION_PROMPT.format(
             original_code=successful_attack.test_code,
-            error=successful_attack.description[:200] if successful_attack.description else "Unknown"
+            error=successful_attack.description[:200]
+            if successful_attack.description
+            else "Unknown",
         )
 
         try:
             response = self.client.chat.completions.create(
                 model=self.config.attacker_model,
                 messages=[
-                    {"role": "system", "content": "You evolve attacks through mutation."},
+                    {
+                        "role": "system",
+                        "content": "You evolve attacks through mutation.",
+                    },
                     {"role": "user", "content": prompt},
                 ],
                 temperature=1.0,
@@ -251,7 +258,9 @@ Output the combined test in ```python``` block."""
                 prompt += f"- [{a.attack_type}] {a.description[:60]}...\n"
 
             # Подсказка что ещё не пробовали
-            untried_types = set(["edge_case", "invalid_input", "overflow", "injection", "boundary"]) - set(by_type.keys())
+            untried_types = set(
+                ["edge_case", "invalid_input", "overflow", "injection", "boundary"]
+            ) - set(by_type.keys())
             untried_funcs = set(available_functions) - set(by_function.keys())
 
             if untried_types:
@@ -283,6 +292,7 @@ Output the combined test in ```python``` block."""
             if "401" in error_msg or "429" in error_msg or "500" in error_msg:
                 logger.warning(f"API error (will retry): {error_msg[:100]}")
                 import time
+
                 time.sleep(2)
                 try:
                     response = self.client.chat.completions.create(
@@ -313,7 +323,9 @@ Output the combined test in ```python``` block."""
         if not code_match:
             code_match = re.search(r"```\n(.*?)```", content, re.DOTALL)
         if not code_match:
-            logger.warning(f"No code block found. Response starts with: {content[:200]}")
+            logger.warning(
+                f"No code block found. Response starts with: {content[:200]}"
+            )
             return None
 
         test_code = code_match.group(1).strip()
@@ -332,17 +344,30 @@ Output the combined test in ```python``` block."""
 
         # Способ 2: # Attack on <function> with <type>
         if attack_type == "unknown":
-            type_match = re.search(r"#\s*Attack.*?(edge.?case|invalid.?input|overflow|injection|boundary|resource)", content, re.IGNORECASE)
+            type_match = re.search(
+                r"#\s*Attack.*?(edge.?case|invalid.?input|overflow|injection|boundary|resource)",
+                content,
+                re.IGNORECASE,
+            )
             if type_match:
-                attack_type = type_match.group(1).lower().replace(" ", "_").replace("-", "_")
+                attack_type = (
+                    type_match.group(1).lower().replace(" ", "_").replace("-", "_")
+                )
 
         # Способ 3: Определяем по имени теста
         if attack_type == "unknown":
-            func_match = re.search(r"def test_\w+_(edge|invalid|overflow|injection|boundary|empty|none|null)", test_code, re.IGNORECASE)
+            func_match = re.search(
+                r"def test_\w+_(edge|invalid|overflow|injection|boundary|empty|none|null)",
+                test_code,
+                re.IGNORECASE,
+            )
             if func_match:
                 keyword = func_match.group(1).lower()
                 type_map = {
-                    "edge": "edge_case", "empty": "edge_case", "none": "edge_case", "null": "edge_case",
+                    "edge": "edge_case",
+                    "empty": "edge_case",
+                    "none": "edge_case",
+                    "null": "edge_case",
                     "invalid": "invalid_input",
                     "overflow": "overflow",
                     "injection": "injection",
@@ -353,15 +378,33 @@ Output the combined test in ```python``` block."""
         # Способ 4: Определяем по содержимому теста
         if attack_type == "unknown":
             test_lower = test_code.lower()
-            if "none" in test_lower or "empty" in test_lower or '""' in test_code or "''" in test_code or "{}" in test_code:
+            if (
+                "none" in test_lower
+                or "empty" in test_lower
+                or '""' in test_code
+                or "''" in test_code
+                or "{}" in test_code
+            ):
                 attack_type = "edge_case"
-            elif "recursion" in test_lower or "depth" in test_lower or "10**" in test_code or "1000000" in test_code:
+            elif (
+                "recursion" in test_lower
+                or "depth" in test_lower
+                or "10**" in test_code
+                or "1000000" in test_code
+            ):
                 attack_type = "overflow"
-            elif "\\x" in test_code or "\\n" in test_code or "\\0" in test_code or "unicode" in test_lower:
+            elif (
+                "\\x" in test_code
+                or "\\n" in test_code
+                or "\\0" in test_code
+                or "unicode" in test_lower
+            ):
                 attack_type = "injection"
             elif "inf" in test_lower or "nan" in test_lower or "max_int" in test_lower:
                 attack_type = "boundary"
-            elif "str(" in test_code or "int(" in test_code or "isinstance" in test_lower:
+            elif (
+                "str(" in test_code or "int(" in test_code or "isinstance" in test_lower
+            ):
                 attack_type = "invalid_input"
 
         # Описание - пробуем разные способы
@@ -389,7 +432,9 @@ Output the combined test in ```python``` block."""
                         description = s.strip()[:100]
                         break
 
-        return Attack(test_code=test_code, description=description, attack_type=attack_type)
+        return Attack(
+            test_code=test_code, description=description, attack_type=attack_type
+        )
 
 
 class Defender:

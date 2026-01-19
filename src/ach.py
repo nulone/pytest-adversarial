@@ -73,9 +73,9 @@ class ACHRunner:
         logger.info(f"MAP-Elites: {self.config.drq.use_map_elites}")
 
         for round_num in range(1, self.config.drq.n_rounds + 1):
-            logger.info(f"\n{'='*50}")
+            logger.info(f"\n{'=' * 50}")
             logger.info(f"ROUND {round_num}/{self.config.drq.n_rounds}")
-            logger.info(f"{'='*50}")
+            logger.info(f"{'=' * 50}")
 
             round_result = self._run_round(round_num)
             self.history.append(round_result)
@@ -117,7 +117,9 @@ class ACHRunner:
                 added = self.archive.add(attack, result.score, round_num)
                 if added:
                     new_attacks += 1
-                    logger.debug(f"  Attack {i}: {attack.attack_type} - SUCCESS (fitness={result.score:.2f})")
+                    logger.debug(
+                        f"  Attack {i}: {attack.attack_type} - SUCCESS (fitness={result.score:.2f})"
+                    )
             else:
                 self.failed_attacks.append(attack)
                 if len(self.failed_attacks) > 50:
@@ -137,25 +139,29 @@ class ACHRunner:
             if defense:
                 # Проверяем защиту против ВСЕХ атак
                 defense_result = self.fitness.evaluate_defense(
-                    defense.fixed_code,
-                    all_attacks
+                    defense.fixed_code, all_attacks
                 )
 
                 if defense_result.score > self.config.drq.fitness_threshold:
                     self.current_code = defense.fixed_code
                     successful_defenses = 1
-                    logger.info(f"  Defense accepted: {defense_result.score:.2%} tests pass")
+                    logger.info(
+                        f"  Defense accepted: {defense_result.score:.2%} tests pass"
+                    )
                 else:
-                    logger.info(f"  Defense rejected: only {defense_result.score:.2%} tests pass")
+                    logger.info(
+                        f"  Defense rejected: only {defense_result.score:.2%} tests pass"
+                    )
 
         return {
             "round": round_num,
             "new_attacks": new_attacks,
             "archive_size": len(self.archive),
             "defense_score": self.fitness.evaluate_defense(
-                self.current_code,
-                self.archive.get_all_attacks()
-            ).score if self.archive.get_all_attacks() else 1.0,
+                self.current_code, self.archive.get_all_attacks()
+            ).score
+            if self.archive.get_all_attacks()
+            else 1.0,
             "code_changed": successful_defenses > 0,
         }
 
@@ -181,7 +187,9 @@ class ACHRunner:
             "hardened_code": self.current_code,
             "total_rounds": len(self.history),
             "final_archive_size": len(self.archive),
-            "archive_coverage": self.archive.coverage() if hasattr(self.archive, 'coverage') else {},
+            "archive_coverage": self.archive.coverage()
+            if hasattr(self.archive, "coverage")
+            else {},
             "history": self.history,
             "improvement": self._calculate_improvement(),
         }
@@ -229,46 +237,41 @@ Examples:
   python src/ach.py --target examples/json_parser --rounds 5
   python src/ach.py --target examples/json_parser --preset debug
   python src/ach.py --target my_code.py --no-map-elites
-        """
+        """,
     )
 
     parser.add_argument(
-        "--target", "-t",
-        required=True,
-        help="Path to target code directory or file"
+        "--target", "-t", required=True, help="Path to target code directory or file"
     )
     parser.add_argument(
-        "--rounds", "-r",
+        "--rounds",
+        "-r",
         type=int,
         default=10,
-        help="Number of DRQ rounds (default: 10)"
+        help="Number of DRQ rounds (default: 10)",
     )
     parser.add_argument(
-        "--iterations", "-i",
+        "--iterations",
+        "-i",
         type=int,
         default=50,
-        help="Iterations per round (default: 50)"
+        help="Iterations per round (default: 50)",
     )
     parser.add_argument(
         "--preset",
         choices=["debug", "minimal", "full"],
-        help="Use preset configuration"
+        help="Use preset configuration",
     )
     parser.add_argument(
         "--no-map-elites",
         action="store_true",
-        help="Disable MAP-Elites (for baseline comparison)"
+        help="Disable MAP-Elites (for baseline comparison)",
     )
     parser.add_argument(
-        "--output", "-o",
-        default="results",
-        help="Output directory (default: results)"
+        "--output", "-o", default="results", help="Output directory (default: results)"
     )
     parser.add_argument(
-        "--seed",
-        type=int,
-        default=42,
-        help="Random seed for reproducibility"
+        "--seed", type=int, default=42, help="Random seed for reproducibility"
     )
 
     args = parser.parse_args()
@@ -313,13 +316,15 @@ Examples:
     # Полные результаты
     results_path = output_dir / "results.json"
     # Убираем код из JSON (слишком большой)
-    results_for_json = {k: v for k, v in results.items() if k not in ["original_code", "hardened_code"]}
+    results_for_json = {
+        k: v for k, v in results.items() if k not in ["original_code", "hardened_code"]
+    }
     results_path.write_text(json.dumps(results_for_json, indent=2))
 
     # Выводим summary
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print("RESULTS SUMMARY")
-    print("="*50)
+    print("=" * 50)
     print(f"Rounds completed: {results['total_rounds']}")
     print(f"Attacks discovered: {results['final_archive_size']}")
     print(f"Attack types: {results['archive_coverage']}")

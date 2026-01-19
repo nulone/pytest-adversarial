@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class FitnessResult:
     """Результат оценки."""
+
     score: float  # 0.0 - 1.0
     passed: int  # Сколько тестов прошло
     failed: int  # Сколько упало
@@ -131,10 +132,10 @@ from target import *
 """
             for i, attack in enumerate(attacks):
                 # Переименовываем функции чтобы не конфликтовали
-                renamed_test = attack.test_code.replace(
-                    "def test_", f"def test_{i}_"
+                renamed_test = attack.test_code.replace("def test_", f"def test_{i}_")
+                test_content += (
+                    f"\n# Attack {i}: {attack.description}\n{renamed_test}\n"
                 )
-                test_content += f"\n# Attack {i}: {attack.description}\n{renamed_test}\n"
 
             test_file = tmppath / "test_defense.py"
             test_file.write_text(test_content)
@@ -164,13 +165,17 @@ from target import *
                 sanity_result = self._run_pytest(tmppath, test_file="test_sanity.py")
 
                 if sanity_result.failed > 0:
-                    logger.warning("Sanity tests failed! Defender is gaming the system.")
+                    logger.warning(
+                        "Sanity tests failed! Defender is gaming the system."
+                    )
                     result.score = 0.0
                     result.errors.append("SANITY_FAILED: Original functionality broken")
 
             return result
 
-    def _run_pytest(self, test_dir: Path, test_file: Optional[str] = None) -> FitnessResult:
+    def _run_pytest(
+        self, test_dir: Path, test_file: Optional[str] = None
+    ) -> FitnessResult:
         """
         Запускает pytest и парсит результат.
 
@@ -266,18 +271,18 @@ def quick_test():
     evaluator = FitnessEvaluator()
 
     # Простой код с багом
-    buggy_code = '''
+    buggy_code = """
 def divide(a, b):
     return a / b
-'''
+"""
 
     # Атака: деление на ноль
     attack = Attack(
-        test_code='''
+        test_code="""
 def test_divide_by_zero():
     result = divide(10, 0)
     assert result is not None
-''',
+""",
         description="Division by zero",
         attack_type="edge_case",
     )

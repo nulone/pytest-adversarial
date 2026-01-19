@@ -4,8 +4,8 @@
 Эти тесты реально запускают pytest, поэтому они интеграционные.
 """
 
-
 import sys
+
 sys.path.insert(0, "src")
 
 from fitness import FitnessEvaluator, FitnessResult

@@ -111,6 +111,7 @@ BENCHMARK_PRESETS = {
 @dataclass
 class BenchmarkResult:
     """Результат одной комбинации."""
+
     attacker_model: str
     defender_model: str
     attacker_name: str
@@ -143,10 +144,10 @@ def run_single_benchmark(
     attacker = MODELS[attacker_key]
     defender = MODELS[defender_key]
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"🔴 Attacker: {attacker['name']}")
     print(f"🟢 Defender: {defender['name']}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     # Уникальная директория для этого теста
     run_dir = f"{output_dir}/{attacker_key}_vs_{defender_key}"
@@ -161,10 +162,12 @@ def run_single_benchmark(
         attacker_model=attacker["id"],
         defender_model=defender["id"],
         output_dir=run_dir,
-        estimated_cost_per_call=(attacker["cost_per_call"] + defender["cost_per_call"]) / 2,
+        estimated_cost_per_call=(attacker["cost_per_call"] + defender["cost_per_call"])
+        / 2,
     )
 
     import time
+
     start_time = time.time()
 
     try:
@@ -229,19 +232,21 @@ def run_benchmark(
     n_combinations = len(attackers) * len(defenders)
     calls_per_run = p["rounds"] * (p["attacks"] + 1)  # attacks + 1 defender
 
-    avg_cost = sum(MODELS[m]["cost_per_call"] for m in attackers + defenders) / len(attackers + defenders)
+    avg_cost = sum(MODELS[m]["cost_per_call"] for m in attackers + defenders) / len(
+        attackers + defenders
+    )
     estimated_total = n_combinations * calls_per_run * avg_cost
 
-    print("="*70)
+    print("=" * 70)
     print("🏆 MODEL BENCHMARK")
-    print("="*70)
+    print("=" * 70)
     print(f"Preset: {p['name']}")
     print(f"Rounds: {p['rounds']}, Attacks/round: {p['attacks']}")
     print(f"Combinations: {n_combinations}")
     print(f"Attackers: {[MODELS[a]['name'] for a in attackers]}")
     print(f"Defenders: {[MODELS[d]['name'] for d in defenders]}")
     print(f"Estimated cost: ${estimated_total:.2f}")
-    print("="*70)
+    print("=" * 70)
 
     confirm = input("\nПродолжить? (y/n): ").strip().lower()
     if confirm != "y":
@@ -259,9 +264,9 @@ def run_benchmark(
     for i, attacker_key in enumerate(attackers):
         for j, defender_key in enumerate(defenders):
             combo_num = i * len(defenders) + j + 1
-            print(f"\n{'#'*70}")
+            print(f"\n{'#' * 70}")
             print(f"# COMBO {combo_num}/{n_combinations}")
-            print(f"{'#'*70}")
+            print(f"{'#' * 70}")
 
             result = run_single_benchmark(
                 attacker_key=attacker_key,
@@ -275,9 +280,9 @@ def run_benchmark(
                 results.append(result)
 
     # Анализ результатов
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("📊 BENCHMARK RESULTS")
-    print("="*70)
+    print("=" * 70)
 
     if not results:
         print("❌ Нет результатов")
@@ -287,12 +292,16 @@ def run_benchmark(
     print("\n🏆 TOP COMBINATIONS BY FINAL ROBUSTNESS:")
     by_robustness = sorted(results, key=lambda r: r.final_robustness, reverse=True)
     for i, r in enumerate(by_robustness[:5], 1):
-        print(f"  {i}. {r.attacker_name} vs {r.defender_name}: {r.final_robustness:.1%}")
+        print(
+            f"  {i}. {r.attacker_name} vs {r.defender_name}: {r.final_robustness:.1%}"
+        )
 
     print("\n🔴 TOP ATTACKERS (by attacks found):")
     by_attacks = sorted(results, key=lambda r: r.total_attacks, reverse=True)
     for i, r in enumerate(by_attacks[:5], 1):
-        print(f"  {i}. {r.attacker_name}: {r.total_attacks} attacks, {r.attack_types} types")
+        print(
+            f"  {i}. {r.attacker_name}: {r.total_attacks} attacks, {r.attack_types} types"
+        )
 
     print("\n🟢 TOP DEFENDERS (by peak robustness):")
     by_defense = sorted(results, key=lambda r: r.peak_robustness, reverse=True)
@@ -300,19 +309,29 @@ def run_benchmark(
         print(f"  {i}. {r.defender_name}: {r.peak_robustness:.1%} peak")
 
     print("\n💰 COST EFFICIENCY (robustness per $):")
-    by_efficiency = sorted(results, key=lambda r: r.final_robustness / max(r.estimated_cost, 0.01), reverse=True)
+    by_efficiency = sorted(
+        results,
+        key=lambda r: r.final_robustness / max(r.estimated_cost, 0.01),
+        reverse=True,
+    )
     for i, r in enumerate(by_efficiency[:5], 1):
         efficiency = r.final_robustness / max(r.estimated_cost, 0.01)
-        print(f"  {i}. {r.attacker_name} vs {r.defender_name}: {efficiency:.1f}%/$ (${r.estimated_cost:.2f})")
+        print(
+            f"  {i}. {r.attacker_name} vs {r.defender_name}: {efficiency:.1f}%/$ (${r.estimated_cost:.2f})"
+        )
 
     # Таблица всех результатов
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("📋 FULL RESULTS TABLE")
-    print("="*70)
-    print(f"{'Attacker':<15} {'Defender':<15} {'Final%':<8} {'Peak%':<8} {'Attacks':<8} {'Types':<6} {'Cost':<8}")
-    print("-"*70)
+    print("=" * 70)
+    print(
+        f"{'Attacker':<15} {'Defender':<15} {'Final%':<8} {'Peak%':<8} {'Attacks':<8} {'Types':<6} {'Cost':<8}"
+    )
+    print("-" * 70)
     for r in sorted(results, key=lambda r: r.final_robustness, reverse=True):
-        print(f"{r.attacker_name:<15} {r.defender_name:<15} {r.final_robustness:>6.1%}  {r.peak_robustness:>6.1%}  {r.total_attacks:>6}  {r.attack_types:>4}  ${r.estimated_cost:>5.2f}")
+        print(
+            f"{r.attacker_name:<15} {r.defender_name:<15} {r.final_robustness:>6.1%}  {r.peak_robustness:>6.1%}  {r.total_attacks:>6}  {r.attack_types:>4}  ${r.estimated_cost:>5.2f}"
+        )
 
     # Сохраняем результаты
     summary = {
@@ -349,13 +368,17 @@ def run_benchmark(
     print(f"💰 Total cost: ${summary['total_cost']:.2f}")
 
     # Рекомендации
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("💡 RECOMMENDATIONS")
-    print("="*70)
+    print("=" * 70)
     print(f"Best Attacker: {by_attacks[0].attacker_name}")
     print(f"Best Defender: {by_defense[0].defender_name}")
-    print(f"Best Overall: {by_robustness[0].attacker_name} vs {by_robustness[0].defender_name}")
-    print(f"Best Value: {by_efficiency[0].attacker_name} vs {by_efficiency[0].defender_name}")
+    print(
+        f"Best Overall: {by_robustness[0].attacker_name} vs {by_robustness[0].defender_name}"
+    )
+    print(
+        f"Best Value: {by_efficiency[0].attacker_name} vs {by_efficiency[0].defender_name}"
+    )
 
     return summary
 
@@ -374,7 +397,7 @@ def main():
     for key, m in MODELS.items():
         print(f"  {key}: {m['name']} (${m['cost_per_call']:.3f}/call)")
 
-    print("\n" + "-"*50)
+    print("\n" + "-" * 50)
 
     # Выбор пресета
     preset = input("Preset (quick/standard/full) [quick]: ").strip() or "quick"
@@ -389,13 +412,17 @@ def main():
 
     attackers_input = input(f"Attackers [{','.join(default_attackers)}]: ").strip()
     if attackers_input:
-        attackers = [a.strip() for a in attackers_input.split(",") if a.strip() in MODELS]
+        attackers = [
+            a.strip() for a in attackers_input.split(",") if a.strip() in MODELS
+        ]
     else:
         attackers = default_attackers
 
     defenders_input = input(f"Defenders [{','.join(default_defenders)}]: ").strip()
     if defenders_input:
-        defenders = [d.strip() for d in defenders_input.split(",") if d.strip() in MODELS]
+        defenders = [
+            d.strip() for d in defenders_input.split(",") if d.strip() in MODELS
+        ]
     else:
         defenders = default_defenders
 

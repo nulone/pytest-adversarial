@@ -36,13 +36,13 @@ def run_convergent_experiment(
         target_file: Целевой файл
     """
 
-    print("="*70)
+    print("=" * 70)
     print("🔬 CONVERGENT EVOLUTION EXPERIMENT")
-    print("="*70)
+    print("=" * 70)
     print(f"Independent runs: {n_runs}")
     print(f"Rounds per run: {n_rounds}")
     print(f"Target: {target_file}")
-    print("="*70)
+    print("=" * 70)
 
     # Проверяем API
     if not get_api_config():
@@ -58,9 +58,9 @@ def run_convergent_experiment(
     exp_dir.mkdir(parents=True, exist_ok=True)
 
     for run_id in range(1, n_runs + 1):
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"🔄 RUN {run_id}/{n_runs}")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
 
         # Конфиг для этого запуска
         config = DRQConfig(
@@ -82,7 +82,9 @@ def run_convergent_experiment(
             "final_robustness": results["final_robustness"],
             "total_attacks": len(runner.attack_archive.get_all()),
             "niches_covered": len(runner.attack_archive.archive),
-            "attack_types": list(set(a.attack_type for a in runner.attack_archive.get_all())),
+            "attack_types": list(
+                set(a.attack_type for a in runner.attack_archive.get_all())
+            ),
             "api_calls": results["api_calls"],
             "cost": results["estimated_cost"],
         }
@@ -95,9 +97,9 @@ def run_convergent_experiment(
         print(f"   Types: {run_summary['attack_types']}")
 
     # Анализ конвергенции
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("📈 CONVERGENT EVOLUTION ANALYSIS")
-    print("="*70)
+    print("=" * 70)
 
     robustness_values = [r["final_robustness"] for r in all_results]
     attack_counts = [r["total_attacks"] for r in all_results]
@@ -114,17 +116,17 @@ def run_convergent_experiment(
 
     print("\n1. ROBUSTNESS CONVERGENCE:")
     print(f"   Values: {[f'{v:.1%}' for v in robustness_values]}")
-    print(f"   Mean: {sum(robustness_values)/len(robustness_values):.1%}")
+    print(f"   Mean: {sum(robustness_values) / len(robustness_values):.1%}")
     print(f"   Spread: {max(robustness_values) - min(robustness_values):.1%}")
 
     print("\n2. ATTACK CONVERGENCE:")
     print(f"   Total unique types found: {len(all_types)}")
     print(f"   Types found in ALL runs: {common_types}")
-    print(f"   Convergence rate: {len(common_types)/len(all_types):.1%}")
+    print(f"   Convergence rate: {len(common_types) / len(all_types):.1%}")
 
     print("\n3. ATTACK COUNTS:")
     print(f"   Per run: {attack_counts}")
-    print(f"   Mean: {sum(attack_counts)/len(attack_counts):.1f}")
+    print(f"   Mean: {sum(attack_counts) / len(attack_counts):.1f}")
 
     # Сохраняем сводку
     summary = {
@@ -135,11 +137,11 @@ def run_convergent_experiment(
         "target_file": target_file,
         "runs": all_results,
         "analysis": {
-            "robustness_mean": sum(robustness_values)/len(robustness_values),
+            "robustness_mean": sum(robustness_values) / len(robustness_values),
             "robustness_spread": max(robustness_values) - min(robustness_values),
             "all_attack_types": list(all_types),
             "common_attack_types": list(common_types),
-            "convergence_rate": len(common_types)/len(all_types) if all_types else 0,
+            "convergence_rate": len(common_types) / len(all_types) if all_types else 0,
         },
         "total_cost": sum(r["cost"] for r in all_results),
     }
@@ -151,12 +153,12 @@ def run_convergent_experiment(
     print(f"💰 Total cost: ${summary['total_cost']:.2f}")
 
     # Вердикт
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("🎯 CONVERGENCE VERDICT")
-    print("="*70)
+    print("=" * 70)
 
     spread = max(robustness_values) - min(robustness_values)
-    convergence = len(common_types)/len(all_types) if all_types else 0
+    convergence = len(common_types) / len(all_types) if all_types else 0
 
     if spread < 0.1 and convergence > 0.5:
         print("✅ STRONG CONVERGENCE")

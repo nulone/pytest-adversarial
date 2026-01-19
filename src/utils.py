@@ -19,7 +19,7 @@ def extract_functions(source_code: str) -> list[str]:
     for node in ast.walk(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             # Filter out __magic__ methods
-            if not (node.name.startswith('__') and node.name.endswith('__')):
+            if not (node.name.startswith("__") and node.name.endswith("__")):
                 functions.append(node.name)
 
     return functions

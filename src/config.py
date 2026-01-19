@@ -25,9 +25,9 @@ API_OPENAI = "https://api.openai.com/v1"
 # ═══════════════════════════════════════════════════════════════
 
 # OpenRouter модели (рекомендуется — быстрее)
-MODEL_GPT4O_MINI = "openai/gpt-4o-mini"           # $0.15/$0.60 за 1M
-MODEL_DEEPSEEK_CHAT = "deepseek/deepseek-chat"    # $0.14/$0.28 за 1M
-MODEL_CLAUDE_HAIKU = "anthropic/claude-3-haiku"   # $0.25/$1.25 за 1M
+MODEL_GPT4O_MINI = "openai/gpt-4o-mini"  # $0.15/$0.60 за 1M
+MODEL_DEEPSEEK_CHAT = "deepseek/deepseek-chat"  # $0.14/$0.28 за 1M
+MODEL_CLAUDE_HAIKU = "anthropic/claude-3-haiku"  # $0.25/$1.25 за 1M
 MODEL_LLAMA_70B = "meta-llama/llama-3.1-70b-instruct"  # Бесплатно!
 
 # Премиум
@@ -91,6 +91,7 @@ class ModelConfig:
 @dataclass
 class DRQConfig:
     """Настройки алгоритма DRQ."""
+
     n_rounds: int = 5
     n_iterations: int = 20
     use_map_elites: bool = False
@@ -102,6 +103,7 @@ class DRQConfig:
 @dataclass
 class ExperimentConfig:
     """Настройки эксперимента."""
+
     target_dir: str = "examples/json_parser"
     output_dir: str = "results"
     log_level: str = "INFO"
@@ -112,6 +114,7 @@ class ExperimentConfig:
 @dataclass
 class Config:
     """Главный конфиг."""
+
     model: ModelConfig = field(default_factory=ModelConfig)
     drq: DRQConfig = field(default_factory=DRQConfig)
     experiment: ExperimentConfig = field(default_factory=ExperimentConfig)

@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ArchiveEntry:
     """Элемент архива."""
+
     attack: Attack
     fitness: float  # 0-1, выше = лучше атака
     round_discovered: int  # В каком раунде нашли
@@ -98,7 +99,9 @@ class MAPElitesArchive:
 
         # Сравниваем fitness
         if fitness > self.archive[cell].fitness:
-            logger.debug(f"Improved cell {cell}: {self.archive[cell].fitness:.3f} -> {fitness:.3f}")
+            logger.debug(
+                f"Improved cell {cell}: {self.archive[cell].fitness:.3f} -> {fitness:.3f}"
+            )
             self.archive[cell] = entry
             return True
 
@@ -123,24 +126,20 @@ class MAPElitesArchive:
     def get_best(self, n: int = 5) -> list[ArchiveEntry]:
         """Возвращает топ-N атак по fitness."""
         sorted_entries = sorted(
-            self.archive.values(),
-            key=lambda e: e.fitness,
-            reverse=True
+            self.archive.values(), key=lambda e: e.fitness, reverse=True
         )
         return sorted_entries[:n]
 
     def coverage(self) -> dict[str, int]:
         """Статистика заполнения архива по типам атак."""
         from collections import Counter
+
         types = [cell[0] for cell in self.archive.keys()]
         return dict(Counter(types))
 
     def save(self, path: Path) -> None:
         """Сохраняет архив в JSON."""
-        data = {
-            str(k): v.to_dict()
-            for k, v in self.archive.items()
-        }
+        data = {str(k): v.to_dict() for k, v in self.archive.items()}
         path.write_text(json.dumps(data, indent=2))
         logger.info(f"Archive saved to {path} ({len(self.archive)} entries)")
 
@@ -162,7 +161,9 @@ class MAPElitesArchive:
         return len(self.archive)
 
     def __repr__(self) -> str:
-        return f"MAPElitesArchive({len(self.archive)} entries, coverage={self.coverage()})"
+        return (
+            f"MAPElitesArchive({len(self.archive)} entries, coverage={self.coverage()})"
+        )
 
 
 # Упрощённый архив без MAP-Elites для сравнения (baseline)
@@ -182,12 +183,13 @@ class SimpleArchive:
 
         # Сортируем и обрезаем
         self.entries.sort(key=lambda e: e.fitness, reverse=True)
-        self.entries = self.entries[:self.max_size]
+        self.entries = self.entries[: self.max_size]
 
         return True
 
     def sample(self, n: int = 1) -> list[Attack]:
         import random
+
         n = min(n, len(self.entries))
         sampled = random.sample(self.entries, n) if self.entries else []
         return [e.attack for e in sampled]

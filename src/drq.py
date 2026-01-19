@@ -94,7 +94,9 @@ class DRQRunner:
         self.evaluator = FitnessEvaluator()
 
         # Archives
-        self.attack_archive = MAPElitesArchive(max_per_niche=config.max_attacks_per_niche)
+        self.attack_archive = MAPElitesArchive(
+            max_per_niche=config.max_attacks_per_niche
+        )
         self.defense_archive = DefenseArchive(max_size=config.max_defenders)
 
         # Current code
@@ -118,15 +120,15 @@ class DRQRunner:
     def run(self) -> dict:
         """Runs DRQ evolution."""
 
-        print("="*70)
+        print("=" * 70)
         print("🔴🟢 pytest-adversarial")
-        print("="*70)
+        print("=" * 70)
         print(f"Provider: {self.provider}")
         print(f"Attacker: {self.config.attacker_model}")
         print(f"Defender: {self.config.defender_model}")
         print(f"Rounds: {self.config.n_rounds}")
         print(f"Attacks per round: {self.config.attacks_per_round}")
-        print("="*70)
+        print("=" * 70)
 
         start_time = time.time()
 
@@ -153,9 +155,9 @@ class DRQRunner:
     def _run_round(self, round_num: int) -> dict:
         """One round of DRQ."""
 
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"🔄 ROUND {round_num}/{self.config.n_rounds}")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
 
         round_stats = {
             "round": round_num,
@@ -178,7 +180,11 @@ class DRQRunner:
         for i in range(self.config.attacks_per_round):
             # Get diverse previous attacks for context
             previous = [
-                Attack(test_code=g.code, description=g.description, attack_type=g.attack_type)
+                Attack(
+                    test_code=g.code,
+                    description=g.description,
+                    attack_type=g.attack_type,
+                )
                 for g in self.attack_archive.get_diverse_sample(5)
             ]
 
@@ -191,7 +197,7 @@ class DRQRunner:
             self.metrics["api_calls"] += 1
 
             if not attack:
-                print(f"      ⚠️  Attack {i+1}: failed to parse response")
+                print(f"      ⚠️  Attack {i + 1}: failed to parse response")
                 continue
 
             round_stats["attacks_generated"] += 1
@@ -200,10 +206,12 @@ class DRQRunner:
             result = self.evaluator.evaluate_attack(self.current_code, attack)
 
             # DEBUG: show test result
-            print(f"      🔍 Attack {i+1} [{attack.attack_type}]: score={result.score}, passed={result.passed}, failed={result.failed}")
+            print(
+                f"      🔍 Attack {i + 1} [{attack.attack_type}]: score={result.score}, passed={result.passed}, failed={result.failed}"
+            )
             if result.score == 0.0:
                 # Show attack code to understand why it failed
-                code_preview = attack.test_code.replace('\n', ' ')[:100]
+                code_preview = attack.test_code.replace("\n", " ")[:100]
                 print(f"         Code: {code_preview}...")
             if result.errors:
                 print(f"         Errors: {result.errors[0][:80]}")
@@ -248,7 +256,11 @@ class DRQRunner:
 
                 # Try mutating best attack
                 best = max(all_attacks, key=lambda g: g.fitness)
-                best_attack = Attack(test_code=best.code, description=best.description, attack_type=best.attack_type)
+                best_attack = Attack(
+                    test_code=best.code,
+                    description=best.description,
+                    attack_type=best.attack_type,
+                )
 
                 mutated = self.attacker.mutate_attack(best_attack)
                 self.metrics["api_calls"] += 1
@@ -271,15 +283,26 @@ class DRQRunner:
                 # Try crossover of two random attacks
                 if len(all_attacks) >= 2 and not successful_attacks:
                     import random
+
                     a1, a2 = random.sample(all_attacks, 2)
-                    attack1 = Attack(test_code=a1.code, description=a1.description, attack_type=a1.attack_type)
-                    attack2 = Attack(test_code=a2.code, description=a2.description, attack_type=a2.attack_type)
+                    attack1 = Attack(
+                        test_code=a1.code,
+                        description=a1.description,
+                        attack_type=a1.attack_type,
+                    )
+                    attack2 = Attack(
+                        test_code=a2.code,
+                        description=a2.description,
+                        attack_type=a2.attack_type,
+                    )
 
                     crossed = self.attacker.crossover_attacks(attack1, attack2)
                     self.metrics["api_calls"] += 1
 
                     if crossed:
-                        result = self.evaluator.evaluate_attack(self.current_code, crossed)
+                        result = self.evaluator.evaluate_attack(
+                            self.current_code, crossed
+                        )
                         if result.score >= 0.5:
                             genome = AttackGenome(
                                 code=crossed.test_code,
@@ -290,7 +313,9 @@ class DRQRunner:
                                 generation=round_num,
                             )
                             if self.attack_archive.add(genome):
-                                print(f"   ✅ Crossover successful: {crossed.attack_type}")
+                                print(
+                                    f"   ✅ Crossover successful: {crossed.attack_type}"
+                                )
                                 successful_attacks.append(crossed)
 
         # ═══════════════════════════════════════════════════════════
@@ -313,7 +338,9 @@ class DRQRunner:
 
         # Convert to Attack for defender
         failing_attacks = [
-            Attack(test_code=g.code, description=g.description, attack_type=g.attack_type)
+            Attack(
+                test_code=g.code, description=g.description, attack_type=g.attack_type
+            )
             for g in attacks_to_defend
         ]
 
@@ -350,7 +377,11 @@ class DRQRunner:
         ]
 
         for genome in all_attacks:
-            attack = Attack(test_code=genome.code, description=genome.description, attack_type=genome.attack_type)
+            attack = Attack(
+                test_code=genome.code,
+                description=genome.description,
+                attack_type=genome.attack_type,
+            )
 
             # Attack is "blocked" if test PASSES (doesn't crash) on new code
             result = self.evaluator.evaluate_attack(defense.fixed_code, attack)
@@ -373,7 +404,9 @@ class DRQRunner:
                 blocks_count += 1
                 print(f"      ✓ Handled: {genome.attack_type} (defensive exception)")
             else:
-                print(f"      ✗ Crashed: {genome.attack_type} - {result.errors[0][:50] if result.errors else 'unknown'}")
+                print(
+                    f"      ✗ Crashed: {genome.attack_type} - {result.errors[0][:50] if result.errors else 'unknown'}"
+                )
 
         robustness = blocks_count / len(all_attacks) if all_attacks else 1.0
 
@@ -398,17 +431,23 @@ class DRQRunner:
         if robustness > current_robustness:
             self.current_code = defense.fixed_code
             round_stats["defense_improved"] = True
-            print(f"   ✅ Defense improved! {current_robustness:.1%} → {robustness:.1%}")
+            print(
+                f"   ✅ Defense improved! {current_robustness:.1%} → {robustness:.1%}"
+            )
         elif robustness == current_robustness and robustness > 0:
             print(f"   📊 Robustness: {robustness:.1%} (same as current)")
         else:
-            print(f"   📊 Robustness: {robustness:.1%} (not better than {current_robustness:.1%})")
+            print(
+                f"   📊 Robustness: {robustness:.1%} (not better than {current_robustness:.1%})"
+            )
 
         round_stats["new_robustness"] = robustness
 
         # Update metrics
         self.metrics["robustness_over_time"].append(robustness)
-        self.metrics["estimated_cost"] = self.metrics["api_calls"] * self.config.estimated_cost_per_call
+        self.metrics["estimated_cost"] = (
+            self.metrics["api_calls"] * self.config.estimated_cost_per_call
+        )
 
         # Round stats
         print(f"\n📊 Round {round_num} stats:")
@@ -432,20 +471,27 @@ class DRQRunner:
 
         # Same defensive exception patterns
         DEFENSIVE_PATTERNS = [
-            "ValueError", "TypeError", "Input must be", "Input cannot be",
-            "Input string cannot", "must be a string", "must be a dict",
-            "cannot be empty", "cannot be None", "Invalid input",
+            "ValueError",
+            "TypeError",
+            "Input must be",
+            "Input cannot be",
+            "Input string cannot",
+            "must be a string",
+            "must be a dict",
+            "cannot be empty",
+            "cannot be None",
+            "Invalid input",
         ]
 
         # Test against last N defenders
-        test_defenders = defenders[-self.config.test_against_previous:]
+        test_defenders = defenders[-self.config.test_against_previous :]
 
         defeats = 0
         for defense in test_defenders:
             attack = Attack(
                 test_code=genome.code,
                 description=genome.description,
-                attack_type=genome.attack_type
+                attack_type=genome.attack_type,
             )
             result = self.evaluator.evaluate_attack(defense.code, attack)
 
@@ -475,14 +521,25 @@ class DRQRunner:
 
         # Same patterns as main loop
         DEFENSIVE_PATTERNS = [
-            "ValueError", "TypeError", "Input must be", "Input cannot be",
-            "Input string cannot", "must be a string", "must be a dict",
-            "cannot be empty", "cannot be None", "Invalid input",
+            "ValueError",
+            "TypeError",
+            "Input must be",
+            "Input cannot be",
+            "Input string cannot",
+            "must be a string",
+            "must be a dict",
+            "cannot be empty",
+            "cannot be None",
+            "Invalid input",
         ]
 
         blocks = 0
         for genome in all_attacks:
-            attack = Attack(test_code=genome.code, description=genome.description, attack_type=genome.attack_type)
+            attack = Attack(
+                test_code=genome.code,
+                description=genome.description,
+                attack_type=genome.attack_type,
+            )
             result = self.evaluator.evaluate_attack(self.current_code, attack)
 
             # Check defensive exceptions
@@ -547,9 +604,9 @@ class DRQRunner:
         results_path = self.output_dir / "results.json"
         results_path.write_text(json.dumps(results, indent=2, ensure_ascii=False))
 
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print("📊 FINAL RESULTS")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
         print(f"Robustness: {self.metrics['final_robustness']:.1%}")
         print(f"Attacks in archive: {len(self.attack_archive.get_all())}")
         print(f"Niches filled: {len(self.attack_archive.archive)}")
@@ -565,10 +622,8 @@ def main():
     # Enable logging for debug
     import logging
     import sys
-    logging.basicConfig(
-        level=logging.WARNING,
-        format='%(name)s: %(message)s'
-    )
+
+    logging.basicConfig(level=logging.WARNING, format="%(name)s: %(message)s")
 
     # Check API
     if not get_api_config():
@@ -622,14 +677,16 @@ def main():
     }
 
     # CLI selection
-    print("="*70)
+    print("=" * 70)
     print("🔴🟢 pytest-adversarial")
-    print("="*70)
+    print("=" * 70)
     print("\nSelect mode:\n")
 
     for i, (key, preset) in enumerate(PRESETS.items(), 1):
         print(f"  {i}. {preset['name']}")
-        print(f"     {preset['rounds']} rounds × {preset['attacks']} attacks | {preset['cost']}")
+        print(
+            f"     {preset['rounds']} rounds × {preset['attacks']} attacks | {preset['cost']}"
+        )
         print()
 
     try:

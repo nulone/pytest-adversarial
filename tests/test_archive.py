@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 
 import sys
+
 sys.path.insert(0, "src")
 
 from archive import MAPElitesArchive, SimpleArchive, ArchiveEntry
@@ -41,7 +42,9 @@ class TestMAPElitesArchive:
         archive = MAPElitesArchive()
 
         attack1 = Attack("def test_1(): pass", "First", "edge_case")
-        attack2 = Attack("def test_2(): pass", "Second", "edge_case")  # Тот же тип, та же сложность
+        attack2 = Attack(
+            "def test_2(): pass", "Second", "edge_case"
+        )  # Тот же тип, та же сложность
 
         archive.add(attack1, fitness=0.9, round_num=1)
         added = archive.add(attack2, fitness=0.5, round_num=2)

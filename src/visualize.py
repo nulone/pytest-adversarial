@@ -39,25 +39,33 @@ def plot_robustness(results: dict, output_dir: Path) -> None:
         return
 
     plt.figure(figsize=(10, 6))
-    plt.plot(range(1, len(robustness) + 1), robustness, 'g-o', linewidth=2, markersize=8)
-    plt.fill_between(range(1, len(robustness) + 1), robustness, alpha=0.3, color='green')
+    plt.plot(
+        range(1, len(robustness) + 1), robustness, "g-o", linewidth=2, markersize=8
+    )
+    plt.fill_between(
+        range(1, len(robustness) + 1), robustness, alpha=0.3, color="green"
+    )
 
-    plt.xlabel('Round', fontsize=12)
-    plt.ylabel('Robustness', fontsize=12)
-    plt.title('Defense Robustness Evolution', fontsize=14)
+    plt.xlabel("Round", fontsize=12)
+    plt.ylabel("Robustness", fontsize=12)
+    plt.title("Defense Robustness Evolution", fontsize=14)
     plt.ylim(0, 1.05)
     plt.grid(True, alpha=0.3)
 
     # Аннотации
     if robustness:
-        plt.annotate(f'Start: {robustness[0]:.1%}',
-                    xy=(1, robustness[0]),
-                    xytext=(1.5, robustness[0] + 0.1),
-                    fontsize=10)
-        plt.annotate(f'Final: {robustness[-1]:.1%}',
-                    xy=(len(robustness), robustness[-1]),
-                    xytext=(len(robustness) - 1, robustness[-1] + 0.1),
-                    fontsize=10)
+        plt.annotate(
+            f"Start: {robustness[0]:.1%}",
+            xy=(1, robustness[0]),
+            xytext=(1.5, robustness[0] + 0.1),
+            fontsize=10,
+        )
+        plt.annotate(
+            f"Final: {robustness[-1]:.1%}",
+            xy=(len(robustness), robustness[-1]),
+            xytext=(len(robustness) - 1, robustness[-1] + 0.1),
+            fontsize=10,
+        )
 
     plt.tight_layout()
     plt.savefig(output_dir / "robustness_evolution.png", dpi=150)
@@ -89,14 +97,19 @@ def plot_attack_coverage(results: dict, output_dir: Path) -> None:
     colors = plt.cm.Reds([c / max(counts) for c in counts])
     bars = plt.barh(types, counts, color=colors)
 
-    plt.xlabel('Number of Attacks', fontsize=12)
-    plt.ylabel('Attack Type', fontsize=12)
-    plt.title('MAP-Elites Coverage by Attack Type', fontsize=14)
+    plt.xlabel("Number of Attacks", fontsize=12)
+    plt.ylabel("Attack Type", fontsize=12)
+    plt.title("MAP-Elites Coverage by Attack Type", fontsize=14)
 
     # Добавляем значения на бары
     for bar, count in zip(bars, counts):
-        plt.text(bar.get_width() + 0.1, bar.get_y() + bar.get_height()/2,
-                str(count), va='center', fontsize=10)
+        plt.text(
+            bar.get_width() + 0.1,
+            bar.get_y() + bar.get_height() / 2,
+            str(count),
+            va="center",
+            fontsize=10,
+        )
 
     plt.tight_layout()
     plt.savefig(output_dir / "attack_coverage.png", dpi=150)
@@ -126,19 +139,22 @@ def plot_cost_over_time(results: dict, output_dir: Path) -> None:
     costs = [c * cost_per_call for c in cumulative_calls]
 
     plt.figure(figsize=(10, 6))
-    plt.plot(range(1, len(costs) + 1), costs, 'b-o', linewidth=2)
-    plt.fill_between(range(1, len(costs) + 1), costs, alpha=0.3, color='blue')
+    plt.plot(range(1, len(costs) + 1), costs, "b-o", linewidth=2)
+    plt.fill_between(range(1, len(costs) + 1), costs, alpha=0.3, color="blue")
 
-    plt.xlabel('Round', fontsize=12)
-    plt.ylabel('Cumulative Cost ($)', fontsize=12)
-    plt.title('API Cost Over Time', fontsize=14)
+    plt.xlabel("Round", fontsize=12)
+    plt.ylabel("Cumulative Cost ($)", fontsize=12)
+    plt.title("API Cost Over Time", fontsize=14)
     plt.grid(True, alpha=0.3)
 
     if costs:
-        plt.annotate(f'Total: ${costs[-1]:.2f}',
-                    xy=(len(costs), costs[-1]),
-                    xytext=(len(costs) - 2, costs[-1] + 0.5),
-                    fontsize=12, fontweight='bold')
+        plt.annotate(
+            f"Total: ${costs[-1]:.2f}",
+            xy=(len(costs), costs[-1]),
+            xytext=(len(costs) - 2, costs[-1] + 0.5),
+            fontsize=12,
+            fontweight="bold",
+        )
 
     plt.tight_layout()
     plt.savefig(output_dir / "cost_evolution.png", dpi=150)
@@ -155,12 +171,14 @@ def plot_summary(results: dict, output_dir: Path) -> None:
     ax1 = axes[0, 0]
     robustness = results["metrics"].get("robustness_over_time", [])
     if robustness:
-        ax1.plot(range(1, len(robustness) + 1), robustness, 'g-o', linewidth=2)
-        ax1.fill_between(range(1, len(robustness) + 1), robustness, alpha=0.3, color='green')
+        ax1.plot(range(1, len(robustness) + 1), robustness, "g-o", linewidth=2)
+        ax1.fill_between(
+            range(1, len(robustness) + 1), robustness, alpha=0.3, color="green"
+        )
         ax1.set_ylim(0, 1.05)
-    ax1.set_xlabel('Round')
-    ax1.set_ylabel('Robustness')
-    ax1.set_title('Defense Robustness')
+    ax1.set_xlabel("Round")
+    ax1.set_ylabel("Robustness")
+    ax1.set_title("Defense Robustness")
     ax1.grid(True, alpha=0.3)
 
     # 2. Attack coverage
@@ -168,9 +186,9 @@ def plot_summary(results: dict, output_dir: Path) -> None:
     coverage = results.get("attack_archive_stats", {}).get("coverage_by_type", {})
     coverage = {k: v for k, v in coverage.items() if v > 0}
     if coverage:
-        ax2.barh(list(coverage.keys()), list(coverage.values()), color='red', alpha=0.7)
-    ax2.set_xlabel('Count')
-    ax2.set_title('Attack Types Found')
+        ax2.barh(list(coverage.keys()), list(coverage.values()), color="red", alpha=0.7)
+    ax2.set_xlabel("Count")
+    ax2.set_title("Attack Types Found")
 
     # 3. Round stats
     ax3 = axes[1, 0]
@@ -179,39 +197,46 @@ def plot_summary(results: dict, output_dir: Path) -> None:
         attacks_gen = [r.get("attacks_generated", 0) for r in rounds]
         attacks_succ = [r.get("attacks_successful", 0) for r in rounds]
         x = range(1, len(rounds) + 1)
-        ax3.bar(x, attacks_gen, alpha=0.5, label='Generated', color='gray')
-        ax3.bar(x, attacks_succ, alpha=0.8, label='Successful', color='red')
+        ax3.bar(x, attacks_gen, alpha=0.5, label="Generated", color="gray")
+        ax3.bar(x, attacks_succ, alpha=0.8, label="Successful", color="red")
         ax3.legend()
-    ax3.set_xlabel('Round')
-    ax3.set_ylabel('Attacks')
-    ax3.set_title('Attack Success Rate')
+    ax3.set_xlabel("Round")
+    ax3.set_ylabel("Attacks")
+    ax3.set_title("Attack Success Rate")
 
     # 4. Summary text
     ax4 = axes[1, 1]
-    ax4.axis('off')
+    ax4.axis("off")
 
     summary_text = f"""
     DRQ Summary
     ═══════════════════════════
 
-    Rounds: {results['config'].get('n_rounds', 'N/A')}
+    Rounds: {results["config"].get("n_rounds", "N/A")}
 
-    Final Robustness: {results['metrics'].get('final_robustness', 0):.1%}
+    Final Robustness: {results["metrics"].get("final_robustness", 0):.1%}
 
-    Total Attacks: {results.get('attack_archive_stats', {}).get('total_genomes', 0)}
+    Total Attacks: {results.get("attack_archive_stats", {}).get("total_genomes", 0)}
 
-    Niches Covered: {results.get('attack_archive_stats', {}).get('total_niches', 0)}
+    Niches Covered: {results.get("attack_archive_stats", {}).get("total_niches", 0)}
 
-    API Calls: {results['metrics'].get('api_calls', 0)}
+    API Calls: {results["metrics"].get("api_calls", 0)}
 
-    Estimated Cost: ${results['metrics'].get('estimated_cost', 0):.2f}
+    Estimated Cost: ${results["metrics"].get("estimated_cost", 0):.2f}
     """
 
-    ax4.text(0.1, 0.5, summary_text, fontsize=14, family='monospace',
-             verticalalignment='center', transform=ax4.transAxes,
-             bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+    ax4.text(
+        0.1,
+        0.5,
+        summary_text,
+        fontsize=14,
+        family="monospace",
+        verticalalignment="center",
+        transform=ax4.transAxes,
+        bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.5),
+    )
 
-    plt.suptitle('Digital Red Queen — Results Summary', fontsize=16, fontweight='bold')
+    plt.suptitle("Digital Red Queen — Results Summary", fontsize=16, fontweight="bold")
     plt.tight_layout()
     plt.savefig(output_dir / "drq_summary.png", dpi=150)
     plt.close()

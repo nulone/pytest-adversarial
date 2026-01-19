@@ -9,6 +9,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 import sys
+
 sys.path.insert(0, "src")
 
 from agents import Attacker, Defender, Attack, Defense

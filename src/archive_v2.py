@@ -26,7 +26,7 @@ class AttackGenome:
 
     code: str
     attack_type: str  # edge_case, injection, overflow, etc.
-    error_type: str   # TypeError, ValueError, etc.
+    error_type: str  # TypeError, ValueError, etc.
     description: str
 
     # Fitness metrics
@@ -100,14 +100,14 @@ class MAPElitesArchive:
 
     # Известные типы атак
     ATTACK_TYPES = [
-        "edge_case",      # Граничные значения
+        "edge_case",  # Граничные значения
         "invalid_input",  # Неверные типы
-        "injection",      # Инъекции
-        "overflow",       # Переполнения
-        "unicode",        # Unicode проблемы
-        "concurrency",    # Race conditions
-        "resource",       # Resource exhaustion
-        "unknown",        # Неизвестный тип
+        "injection",  # Инъекции
+        "overflow",  # Переполнения
+        "unicode",  # Unicode проблемы
+        "concurrency",  # Race conditions
+        "resource",  # Resource exhaustion
+        "unknown",  # Неизвестный тип
     ]
 
     # Известные типы ошибок
@@ -225,8 +225,10 @@ class MAPElitesArchive:
             "total_evaluated": self.total_evaluated,
             "acceptance_rate": self.total_added / max(1, self.total_evaluated),
             "coverage_by_type": coverage,
-            "avg_fitness": sum(g.fitness for g in all_genomes) / max(1, len(all_genomes)),
-            "avg_generality": sum(g.generality for g in all_genomes) / max(1, len(all_genomes)),
+            "avg_fitness": sum(g.fitness for g in all_genomes)
+            / max(1, len(all_genomes)),
+            "avg_generality": sum(g.generality for g in all_genomes)
+            / max(1, len(all_genomes)),
         }
 
     def save(self, path: Path) -> None:
@@ -273,7 +275,7 @@ class DefenseArchive:
         # Если архив переполнен — удаляем худшие
         if len(self.archive) > self.max_size:
             self.archive.sort(key=lambda g: g.robustness, reverse=True)
-            self.archive = self.archive[:self.max_size]
+            self.archive = self.archive[: self.max_size]
 
     def get_best(self) -> Optional[DefenseGenome]:
         """Возвращает лучшую защиту."""
@@ -294,5 +296,6 @@ class DefenseArchive:
             "total": len(self.archive),
             "total_history": len(self.history),
             "best_robustness": max(g.robustness for g in self.archive),
-            "avg_robustness": sum(g.robustness for g in self.archive) / len(self.archive),
+            "avg_robustness": sum(g.robustness for g in self.archive)
+            / len(self.archive),
         }

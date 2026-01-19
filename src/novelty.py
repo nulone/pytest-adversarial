@@ -22,6 +22,7 @@ from agents import Attack
 @dataclass
 class NoveltyResult:
     """Результат проверки новизны."""
+
     is_novel: bool
     novelty_score: float  # 0.0 - 1.0
     reason: str
@@ -51,8 +52,8 @@ class NoveltyTracker:
     def _hash_code(self, code: str) -> str:
         """Нормализует и хэширует код."""
         # Убираем комментарии и лишние пробелы
-        normalized = re.sub(r'#.*', '', code)  # Убираем комментарии
-        normalized = re.sub(r'\s+', ' ', normalized)  # Нормализуем пробелы
+        normalized = re.sub(r"#.*", "", code)  # Убираем комментарии
+        normalized = re.sub(r"\s+", " ", normalized)  # Нормализуем пробелы
         normalized = normalized.strip().lower()
         return hashlib.md5(normalized.encode()).hexdigest()[:12]
 
@@ -62,7 +63,7 @@ class NoveltyTracker:
             return "no_error"
 
         # Извлекаем тип исключения
-        exception_match = re.search(r'(\w+Error|\w+Exception)', error_msg)
+        exception_match = re.search(r"(\w+Error|\w+Exception)", error_msg)
         exception_type = exception_match.group(1) if exception_match else "unknown"
 
         # Извлекаем ключевые слова
@@ -161,8 +162,7 @@ class NoveltyTracker:
             "unique_error_types": len(self.error_clusters),
             "attacks_by_type": dict(self.type_counts),
             "largest_cluster": max(
-                (len(v) for v in self.error_clusters.values()),
-                default=0
+                (len(v) for v in self.error_clusters.values()), default=0
             ),
         }
 
@@ -179,18 +179,16 @@ class DefenseQualityChecker:
 
     SUSPICIOUS_PATTERNS = [
         # Пустые except блоки
-        (r'except.*:\s*pass', "empty_except", 0.3),
-        (r'except.*:\s*return None', "swallow_to_none", 0.4),
-        (r'except.*:\s*return \{\}', "swallow_to_empty", 0.4),
+        (r"except.*:\s*pass", "empty_except", 0.3),
+        (r"except.*:\s*return None", "swallow_to_none", 0.4),
+        (r"except.*:\s*return \{\}", "swallow_to_empty", 0.4),
         (r'except.*:\s*return ""', "swallow_to_empty_str", 0.4),
-        (r'except.*:\s*return \[\]', "swallow_to_empty_list", 0.4),
-
+        (r"except.*:\s*return \[\]", "swallow_to_empty_list", 0.4),
         # Широкие except без конкретного типа
-        (r'except\s*:', "bare_except", 0.2),
-        (r'except Exception:', "catch_all_exception", 0.1),
-
+        (r"except\s*:", "bare_except", 0.2),
+        (r"except Exception:", "catch_all_exception", 0.1),
         # Подозрительные ранние return
-        (r'if.*:\s*return None', "early_return_none", 0.1),
+        (r"if.*:\s*return None", "early_return_none", 0.1),
     ]
 
     def check_defense_quality(
@@ -220,16 +218,16 @@ class DefenseQualityChecker:
                 total_penalty += penalty * added
 
         # Проверяем не удалил ли Defender слишком много кода
-        old_lines = len(original_code.strip().split('\n'))
-        new_lines = len(fixed_code.strip().split('\n'))
+        old_lines = len(original_code.strip().split("\n"))
+        new_lines = len(fixed_code.strip().split("\n"))
 
         if new_lines < old_lines * 0.5:  # Удалил больше 50% кода
             warnings.append(f"code_reduction: {old_lines} -> {new_lines} lines")
             total_penalty += 0.5
 
         # Проверяем не добавил ли слишком много try/except
-        old_try = len(re.findall(r'\btry\s*:', original_code))
-        new_try = len(re.findall(r'\btry\s*:', fixed_code))
+        old_try = len(re.findall(r"\btry\s*:", original_code))
+        new_try = len(re.findall(r"\btry\s*:", fixed_code))
 
         if new_try > old_try + 3:  # Добавил больше 3 try блоков
             warnings.append(f"try_explosion: {old_try} -> {new_try}")
@@ -246,14 +244,18 @@ def demo():
     # Тестовые атаки
     attacks = [
         Attack("def test_1(): assert parse('')", "Empty input", "edge_case"),
-        Attack("def test_2(): assert parse('')", "Empty input again", "edge_case"),  # Дубликат
+        Attack(
+            "def test_2(): assert parse('')", "Empty input again", "edge_case"
+        ),  # Дубликат
         Attack("def test_3(): assert parse(None)", "None input", "edge_case"),
         Attack("def test_4(): assert parse(123)", "Wrong type", "invalid_input"),
     ]
 
     for attack in attacks:
         result = tracker.check_novelty(attack, "ValueError: invalid input")
-        print(f"{attack.description}: novel={result.is_novel}, score={result.novelty_score:.2f}, reason={result.reason}")
+        print(
+            f"{attack.description}: novel={result.is_novel}, score={result.novelty_score:.2f}, reason={result.reason}"
+        )
         if result.is_novel:
             tracker.register_attack(attack, "ValueError: invalid input")
 
