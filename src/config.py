@@ -37,7 +37,7 @@ MODEL_GPT4O = "openai/gpt-4o"
 
 def get_api_config():
     """Определяет какой API использовать по переменным окружения."""
-    
+
     if os.environ.get("OPENROUTER_API_KEY"):
         return {
             "api_key": os.environ["OPENROUTER_API_KEY"],
@@ -63,23 +63,23 @@ def get_api_config():
 @dataclass
 class ModelConfig:
     """Настройки LLM моделей."""
-    
+
     # API (определяется автоматически)
     api_base_url: str = ""
     api_key: str = ""
     provider: str = ""
-    
+
     # Модели
     attacker_model: str = MODEL_GPT4O_MINI
     attacker_temperature: float = 1.0
-    
+
     defender_model: str = MODEL_GPT4O_MINI
     defender_temperature: float = 0.5
-    
+
     # Общие
     max_tokens: int = 2000
     timeout: int = 60
-    
+
     def __post_init__(self):
         config = get_api_config()
         if config:
@@ -99,7 +99,7 @@ class DRQConfig:
     history_length: int = 10
 
 
-@dataclass 
+@dataclass
 class ExperimentConfig:
     """Настройки эксперимента."""
     target_dir: str = "examples/json_parser"

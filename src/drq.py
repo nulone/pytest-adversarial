@@ -21,20 +21,18 @@ Key features:
    - Measures convergent evolution
 """
 
-import os
 import sys
 import json
 import time
 from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass
-from typing import Optional
 
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from config import ModelConfig, get_api_config, MODEL_GPT4O_MINI
-from agents import Attacker, Defender, Attack, Defense
+from agents import Attacker, Defender, Attack
 from fitness import FitnessEvaluator
 from archive_v2 import MAPElitesArchive, DefenseArchive, AttackGenome, DefenseGenome
 
@@ -172,7 +170,7 @@ class DRQRunner:
         # Generate new attacks, test against current defense
         # ═══════════════════════════════════════════════════════════
 
-        print(f"\n🔴 ATTACKER PHASE")
+        print("\n🔴 ATTACKER PHASE")
         print(f"   Generating {self.config.attacks_per_round} attacks...")
 
         successful_attacks = []
@@ -300,7 +298,7 @@ class DRQRunner:
         # Defender must block ALL attacks in archive
         # ═══════════════════════════════════════════════════════════
 
-        print(f"\n🟢 DEFENDER PHASE")
+        print("\n🟢 DEFENDER PHASE")
 
         # Get diverse sample of attacks to defend against
         attacks_to_defend = self.attack_archive.get_diverse_sample(
@@ -659,7 +657,7 @@ def main():
     )
 
     runner = DRQRunner(config)
-    results = runner.run()
+    runner.run()
 
     print("\n✅ Complete!")
 
