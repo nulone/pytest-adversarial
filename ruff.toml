@@ -1,7 +1,8 @@
+[lint]
 select = ["E", "F", "W"]
 ignore = ["E501"]  # Ignore line length for now
 
-[per-file-ignores]
+[lint.per-file-ignores]
 "experiments/*.py" = ["E402"]  # Allow module imports not at top in experiments
 "tests/*.py" = ["E402"]  # Allow module imports not at top in tests
 "src/drq.py" = ["E402"]  # Allow module imports not at top in main script
