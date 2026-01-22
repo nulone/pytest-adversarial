@@ -41,6 +41,10 @@ export OPENAI_API_KEY=your_key       # OpenAI
 pytest-adversarial
 ```
 
+## Try It Online
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nulone/pytest-adversarial/blob/main/demo.ipynb)
+
 ## How it works
 
 1. **Analyze** — Extracts functions from your code using AST
