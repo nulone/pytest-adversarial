@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from typing import Optional
 from collections import defaultdict
 
-from agents import Attack
+from .agents import Attack
 
 
 @dataclass

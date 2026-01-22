@@ -31,10 +31,10 @@ from dataclasses import dataclass
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from config import ModelConfig, get_api_config, MODEL_GPT4O_MINI
-from agents import Attacker, Defender, Attack
-from fitness import FitnessEvaluator
-from archive_v2 import MAPElitesArchive, DefenseArchive, AttackGenome, DefenseGenome
+from .config import ModelConfig, get_api_config, MODEL_GPT4O_MINI
+from .agents import Attacker, Defender, Attack
+from .fitness import FitnessEvaluator
+from .archive_v2 import MAPElitesArchive, DefenseArchive, AttackGenome, DefenseGenome
 
 
 @dataclass

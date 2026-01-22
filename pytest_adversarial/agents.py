@@ -11,8 +11,8 @@ from typing import Optional
 
 from openai import OpenAI
 
-from config import ModelConfig, get_api_config
-from utils import extract_functions
+from .config import ModelConfig, get_api_config
+from .utils import extract_functions
 
 logger = logging.getLogger(__name__)
 

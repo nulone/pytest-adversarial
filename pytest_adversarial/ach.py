@@ -19,10 +19,10 @@ import logging
 import random
 from pathlib import Path
 
-from config import Config, PRESET_DEBUG, PRESET_MINIMAL, PRESET_FULL
-from agents import Attacker, Defender, Attack
-from archive import MAPElitesArchive, SimpleArchive
-from fitness import FitnessEvaluator
+from .config import Config, PRESET_DEBUG, PRESET_MINIMAL, PRESET_FULL
+from .agents import Attacker, Defender, Attack
+from .archive import MAPElitesArchive, SimpleArchive
+from .fitness import FitnessEvaluator
 
 # Настройка логирования
 logging.basicConfig(

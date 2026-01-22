@@ -4,12 +4,8 @@
 Эти тесты реально запускают pytest, поэтому они интеграционные.
 """
 
-import sys
-
-sys.path.insert(0, "src")
-
-from fitness import FitnessEvaluator, FitnessResult
-from agents import Attack
+from pytest_adversarial.fitness import FitnessEvaluator, FitnessResult
+from pytest_adversarial.agents import Attack
 
 
 class TestFitnessResult:

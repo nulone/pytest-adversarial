@@ -8,18 +8,14 @@
 from unittest.mock import patch, MagicMock
 import pytest
 
-import sys
-
-sys.path.insert(0, "src")
-
-from agents import Attacker, Defender, Attack, Defense
-from config import ModelConfig
+from pytest_adversarial.agents import Attacker, Defender, Attack, Defense
+from pytest_adversarial.config import ModelConfig
 
 
 @pytest.fixture
 def mock_api_client():
     """Mock get_client to avoid API key requirements in tests."""
-    with patch("agents.get_client") as mock:
+    with patch("pytest_adversarial.agents.get_client") as mock:
         mock_client = MagicMock()
         mock.return_value = mock_client
         yield mock_client
@@ -155,7 +151,7 @@ This handles empty input.
 class TestAttackerWithMockedAPI:
     """Тесты Attacker с замоканным API."""
 
-    @patch("agents.get_client")
+    @patch("pytest_adversarial.agents.get_client")
     def test_generate_attack_success(self, mock_get_client):
         # Настраиваем mock
         mock_client = MagicMock()
@@ -193,7 +189,7 @@ def test_injection():
         assert attack.attack_type == "injection"
         assert "DROP TABLE" in attack.test_code
 
-    @patch("agents.get_client")
+    @patch("pytest_adversarial.agents.get_client")
     def test_generate_attack_api_error(self, mock_get_client):
         mock_client = MagicMock()
         mock_get_client.return_value = mock_client
@@ -214,7 +210,7 @@ def test_injection():
 class TestDefenderWithMockedAPI:
     """Тесты Defender с замоканным API."""
 
-    @patch("agents.get_client")
+    @patch("pytest_adversarial.agents.get_client")
     def test_generate_defense_success(self, mock_get_client):
         mock_client = MagicMock()
         mock_get_client.return_value = mock_client

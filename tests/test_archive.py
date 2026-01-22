@@ -5,12 +5,8 @@
 import tempfile
 from pathlib import Path
 
-import sys
-
-sys.path.insert(0, "src")
-
-from archive import MAPElitesArchive, SimpleArchive, ArchiveEntry
-from agents import Attack
+from pytest_adversarial.archive import MAPElitesArchive, SimpleArchive, ArchiveEntry
+from pytest_adversarial.agents import Attack
 
 
 class TestMAPElitesArchive:

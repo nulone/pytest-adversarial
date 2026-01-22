@@ -17,7 +17,7 @@ import logging
 from dataclasses import dataclass, asdict
 from pathlib import Path
 
-from agents import Attack
+from .agents import Attack
 
 logger = logging.getLogger(__name__)
 

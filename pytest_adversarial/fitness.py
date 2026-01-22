@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from agents import Attack
+from .agents import Attack
 
 logger = logging.getLogger(__name__)
 
