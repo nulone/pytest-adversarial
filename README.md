@@ -31,14 +31,14 @@ Exported to: tests/test_adversarial.py
 
 ```bash
 # Install
-pip install -r requirements.txt
+pip install pytest-adversarial
 
 # Set API key (choose one)
 export OPENROUTER_API_KEY=your_key   # OpenRouter
 export OPENAI_API_KEY=your_key       # OpenAI
 
 # Run
-python src/drq.py
+pytest-adversarial
 ```
 
 ## How it works

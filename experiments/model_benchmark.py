@@ -18,26 +18,23 @@ from dataclasses import dataclass
 from typing import Optional
 import shutil
 
-# Находим корень проекта и добавляем src в путь
+# Находим корень проекта и добавляем в путь
 script_dir = Path(__file__).parent.resolve()
 project_root = script_dir.parent
-src_dir = project_root / "src"
 
-# Добавляем оба пути на случай разной структуры
-sys.path.insert(0, str(src_dir))
+# Добавляем корень проекта в путь
 sys.path.insert(0, str(project_root))
 
 # Меняем рабочую директорию на корень проекта
 os.chdir(project_root)
 
 try:
-    from drq import DRQRunner, DRQConfig
-    from config import get_api_config
+    from pytest_adversarial.cli import DRQRunner, DRQConfig
+    from pytest_adversarial.config import get_api_config
 except ImportError as e:
     print(f"❌ Ошибка импорта: {e}")
     print(f"   Текущая директория: {os.getcwd()}")
     print(f"   Project root: {project_root}")
-    print(f"   Src dir: {src_dir}")
     print("\nПопробуй запустить из корня проекта:")
     print(f"   cd {project_root}")
     print("   python3 experiments/model_benchmark.py")

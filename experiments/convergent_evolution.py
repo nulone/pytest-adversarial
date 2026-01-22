@@ -15,11 +15,11 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-# Добавляем src в путь
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+# Добавляем pytest_adversarial в путь
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from drq import DRQRunner, DRQConfig
-from config import get_api_config, MODEL_GPT4O_MINI
+from pytest_adversarial.cli import DRQRunner, DRQConfig
+from pytest_adversarial.config import get_api_config, MODEL_GPT4O_MINI
 
 
 def run_convergent_experiment(
